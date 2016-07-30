@@ -1,0 +1,23 @@
+{
+	"ImportPath": "github.com/pdevine/hello-world",
+	"GoVersion": "go1.6",
+	"Deps": [
+		{
+			"ImportPath": "github.com/mattn/go-runewidth",
+			"Comment": "v0.0.1",
+			"Rev": "d6bea18f789704b5f83375793155289da36a3c7f"
+		},
+		{
+			"ImportPath": "github.com/mitchellh/go-wordwrap",
+			"Rev": "ad45545899c7b13c020ea92b2072220eefad42b8"
+		},
+		{
+			"ImportPath": "github.com/nsf/termbox-go",
+			"Rev": "c45773466a30b680355d6494cc8826113c93cd0f"
+		},
+		{
+			"ImportPath": "github.com/pdevine/termui",
+			"Rev": "8d0dadd5806ababd8f487bc8aa1ca1606a2b1001"
+		}
+	]
+}
