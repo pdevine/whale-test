@@ -4,15 +4,33 @@
 
 package termui
 
-import "strings"
+import (
+	"strings"
+	"syscall"
+	"unsafe"
+)
 
 type Costume struct {
 	Text string
 }
 
+type Vector struct {
+	X float32
+	Y float32
+}
+
+func NewVector(x, y int) *Vector {
+	return &Vector{
+		X: float32(x),
+		Y: float32(y),
+	}
+}
+
 type BaseSprite struct {
 	Block
 	Costumes       []Costume
+	Position       Vector
+	Velocity       Vector
 	CurrentCostume int
 	TextFgColor    Attribute
 	TextBgColor    Attribute
@@ -35,6 +53,21 @@ type ByLayer []BaseSprite
 func (l ByLayer) Len() int           { return len(l) }
 func (l ByLayer) Swap(i, j int)      { l[i], l[j] = l[j], l[i] }
 func (l ByLayer) Less(i, j int) bool { return l[i].Layer < l[j].Layer }
+
+type WinSize struct {
+	Rows    uint16
+	Columns uint16
+	Xpixel  uint16
+	Ypixel  uint16
+}
+
+func GetWinSize() WinSize {
+	ws := WinSize{}
+	syscall.Syscall(syscall.SYS_IOCTL,
+		uintptr(0), uintptr(syscall.TIOCGWINSZ),
+		uintptr(unsafe.Pointer(&ws)))
+	return ws
+}
 
 func NewSpriteGroup() *SpriteGroup {
 	return &SpriteGroup{}
@@ -104,7 +137,23 @@ func (s *BaseSprite) NextCostume() {
 }
 
 func (s *BaseSprite) Update(t EvtTimer) error {
+	s.UpdatePosition()
 	return nil
+}
+
+func (s *BaseSprite) SetPosition(x, y int) {
+	s.Position.X = float32(x)
+	s.Position.Y = float32(y)
+	s.X = int(s.Position.X)
+	s.Y = int(s.Position.Y)
+}
+
+func (s *BaseSprite) UpdatePosition() {
+	// XXX - add proportional positions
+	s.Position.X += s.Velocity.X
+	s.Position.Y += s.Velocity.Y
+	s.X = int(s.Position.X)
+	s.Y = int(s.Position.Y)
 }
 
 // Buffer implements Bufferer interface.
@@ -138,4 +187,42 @@ func (s BaseSprite) Buffer() Buffer {
 	}
 
 	return buf
+}
+
+func (s *BaseSprite) Bounce() {
+	win := GetWinSize()
+	if s.X+s.Width > int(win.Columns) {
+		s.Position.X = float32(int(win.Columns) - s.Width)
+		s.Velocity.X = -s.Velocity.X
+	}
+	if s.X <= 0 {
+		s.Position.X = 0
+		s.Velocity.X = -s.Velocity.X
+	}
+	if s.Y+s.Height > int(win.Rows) {
+		s.Position.Y = float32(int(win.Rows) - s.Height)
+		s.Velocity.Y = -s.Velocity.Y
+	}
+	if s.Y <= 0 {
+		s.Position.Y = 0
+		s.Velocity.Y = -s.Velocity.Y
+	}
+	s.X, s.Y = int(s.Position.X), int(s.Position.Y)
+}
+
+func (s *BaseSprite) Wrap() {
+	win := GetWinSize()
+	if s.X >= int(win.Columns) {
+		s.Position.X = float32(0 - s.Width)
+	}
+	if s.X+s.Width < 0 {
+		s.Position.X = float32(win.Columns)
+	}
+	if s.Y >= int(win.Rows) {
+		s.Position.Y = float32(0 - s.Height)
+	}
+	if s.Y+s.Height < 0 {
+		s.Position.Y = float32(win.Rows)
+	}
+	s.X, s.Y = int(s.Position.X), int(s.Position.Y)
 }

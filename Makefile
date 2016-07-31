@@ -6,7 +6,7 @@ SRC_DIR:=$(shell pwd)
 SRC:=$(shell find ./ -name \*.go -print)
 
 # Build the individual binaries based on source level dependencies
-all: docker
+all: whale
 
 whale: $(SRC)
 	@echo "Building the whale"

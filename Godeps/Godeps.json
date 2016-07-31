@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/pdevine/hello-world",
+	"ImportPath": "github.com/pdevine/whale-test",
 	"GoVersion": "go1.6",
 	"Deps": [
 		{
@@ -17,7 +17,7 @@
 		},
 		{
 			"ImportPath": "github.com/pdevine/termui",
-			"Rev": "8d0dadd5806ababd8f487bc8aa1ca1606a2b1001"
+			"Rev": "66dce373c5a3f84e77168c8f87ef7c62f1a664f6"
 		}
 	]
 }

@@ -2,27 +2,10 @@ package main
 
 import (
 	"math/rand"
-	"syscall"
 	"time"
-	"unsafe"
 
 	ui "github.com/pdevine/termui"
 )
-
-type winsize struct {
-	ws_row, ws_col       uint16
-	ws_xpixel, ws_ypixel uint16
-}
-
-func getwinsize() winsize {
-	ws := winsize{}
-	syscall.Syscall(syscall.SYS_IOCTL,
-		uintptr(0), uintptr(syscall.TIOCGWINSZ),
-		uintptr(unsafe.Pointer(&ws)))
-	return ws
-}
-
-var win winsize
 
 func main() {
 	err := ui.Init()
@@ -37,23 +20,23 @@ func main() {
 
 	f := NewFish()
 	f.TextFgColor = ui.ColorWhite
-	f.X = 7
-	f.Y = 7
+	f.Position.X = 7
+	f.Position.Y = 7
+	f.Velocity.X = 1.0
 
 	sg.Add(f)
 
 	f = NewFish()
-	f.X = 20
-	f.Y = 14
-	f.v.X = 2
+	f.SetPosition(20, 14)
+	f.Velocity.X = 2.0
 
 	sg.Add(f)
 
 	for cnt := 0; cnt < 5; cnt++ {
 		p := NewWhale()
 		p.TextFgColor = ui.ColorWhite
-		p.Y = rand.Intn(50) + 1
-		p.X = rand.Intn(150) + 1
+		y, x := rand.Intn(50)+1, rand.Intn(150)+1
+		p.SetPosition(x, y)
 		sg.Add(p)
 	}
 
@@ -67,8 +50,8 @@ func main() {
 	ui.Handle("/sys/kbd/a", func(ui.Event) {
 		p := NewWhale()
 		p.TextFgColor = ui.ColorWhite
-		p.Y = rand.Intn(50) + 1
-		p.X = rand.Intn(150) + 1
+		y, x := rand.Intn(50)+1, rand.Intn(150)+1
+		p.SetPosition(x, y)
 		sg.Add(p)
 	})
 

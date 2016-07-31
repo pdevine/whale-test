@@ -1,14 +1,9 @@
 package main
 
-import (
-	"image"
-
-	ui "github.com/pdevine/termui"
-)
+import ui "github.com/pdevine/termui"
 
 type Whale struct {
 	ui.BaseSprite
-	v     image.Point
 	blink bool
 }
 
@@ -34,26 +29,19 @@ func NewWhale() *Whale {
 	s := ui.NewBaseSprite(whale_c0)
 	//s.AddCostume(ui.Costume{whale_c0})
 	s.AddCostume(ui.Costume{whale_c1})
+	s.Velocity = ui.Vector{1.0, 1.0}
 	return &Whale{
 		BaseSprite: *s,
-		v:          image.Point{1, 1},
 	}
 }
 
 func (w *Whale) Update(t ui.EvtTimer) error {
-	// bounds detection
-	win = getwinsize()
-	if w.X+w.Width > int(win.ws_col) || w.X <= 0 {
-		w.v.X = -w.v.X
-	}
-	if w.Y+w.Height > int(win.ws_row) || w.Y <= 0 {
-		w.v.Y = -w.v.Y
-	}
-	w.X += w.v.X
-	w.Y += w.v.Y
+	w.Bounce()
 
 	if t.Count%1000 == 0 {
 		w.NextCostume()
 	}
+
+	w.UpdatePosition()
 	return nil
 }
